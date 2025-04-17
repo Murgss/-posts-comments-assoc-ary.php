@@ -71,6 +71,50 @@ foreach ($hierarchy as $post) {
 }
 echo "</ul>";
 
+class Comment {
+    public string $author;
+    public string $content;
+
+    public function __construct($author, $content) {
+        $this->author = $author;
+        $this->content = $content;
+    }
+
+    public function render(): string {
+        return "<li><em>{$this->author}:</em> {$this->content}</li>";
+    }
+}
+
+class Post {
+    public string $title;
+    public string $content;
+    public array $comments = [];
+
+    public function __construct($title, $content) {
+        $this->title = $title;
+        $this->content = $content;
+    }
+
+    public function addComment(Comment $comment) {
+        $this->comments[] = $comment;
+    }
+
+    public function render(): string {
+        $html = "<li><strong>{$this->title}</strong><br>{$this->content}";
+
+        if (!empty($this->comments)) {
+            $html .= "<ul>";
+            foreach ($this->comments as $comment) {
+                $html .= $comment->render();
+            }
+            $html .= "</ul>";
+        }
+
+        $html .= "</li>";
+        return $html;
+    }
+}
+
 
 
 
