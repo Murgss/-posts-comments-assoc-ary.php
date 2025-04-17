@@ -56,6 +56,20 @@ foreach ($flatData as $row) {
         ];
     }
 }
+echo "<ul>";
+foreach ($hierarchy as $post) {
+    echo "<li><strong>{$post['title']}</strong><br>{$post['content']}";
+
+    if (!empty($post['comments'])) {
+        echo "<ul>";
+        foreach ($post['comments'] as $comment) {
+            echo "<li><em>{$comment['author']}:</em> {$comment['content']}</li>";
+        }
+        echo "</ul>";
+    }
+    echo "</li>";
+}
+echo "</ul>";
 
 
 
