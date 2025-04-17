@@ -4,13 +4,13 @@
 // create user sandis_17042025@localhost identified by 'password';
 // grant all privileges  on blog_17042025.* to sandis_17042025@localhost;
 
-$host = 'localhost';
+$servername = 'localhost';
 $dbname = 'blog_17042025';
 $username = 'sandis_17042025';
 $password = 'password';
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=myDB", $username, $password);
+    $conn = new PDO("mysql:host=$servername;dbname=blog_17042025", $username, $password);
     // set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Connected successfully";
@@ -18,25 +18,41 @@ try {
     echo "Connection failed: " . $e->getMessage();
   }
 
-$stmt = $pdo->query("SELECT * FROM posts");
-$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "
-    SELECT
-        p.id AS post_id,
-        p.title AS post_title,
-        p.content AS post_content,
-        c.id AS comment_id,
-        c.author AS comment_author,
-        c.content AS comment_content
-    FROM posts p
-    LEFT JOIN comments c ON p.id = c.post_id
-    ORDER BY p.id, c.id
-";
-$flatData = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+  $sql = "SELECT userId FROM Posts_table";
+  $result = $conn->query($sql);
+  
+//   if ($result->num_rows > 0) {
+//     // output data of each row
+//     while($row = $result->fetch_assoc()) {
+//       echo "id: " . $row["userId"]. "<br>";
+//     }
+//   } else {
+//     echo "0 results";
+//   }
+//   $conn->close();
 
 
 $hierarchy = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $postId = $row['post_id'];
+
+    if (!isset($hierarchicalData[$postId])) {
+        $hierarchicalData[$postId] = [
+            'id' => $row['postId'],
+            'title' => $row['title'],
+            'content' => $row['content'],
+            'comments' => []
+        ];
+    }
+
+    if ($row['comment_id'] !== null) {
+        $hierarchicalData[$postId]['comments'][] = [
+            'id' => $row['comment_id'],
+            'text' => $row['comment_text']
+        ];
+    }
+}
 
 foreach ($flatData as $row) {
     $postId = $row['post_id'];
@@ -51,7 +67,6 @@ foreach ($flatData as $row) {
 
     if (!empty($row['comment_id'])) {
         $hierarchy[$postId]['comments'][] = [
-            'author' => $row['comment_author'],
             'content' => $row['comment_content']
         ];
     }
