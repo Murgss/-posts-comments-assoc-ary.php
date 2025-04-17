@@ -115,6 +115,28 @@ class Post {
     }
 }
 
+$posts = [];
+
+foreach ($flatData as $row) {
+    $postId = $row['post_id'];
+
+    if (!isset($posts[$postId])) {
+        $posts[$postId] = new Post($row['post_title'], $row['post_content']);
+    }
+
+    if (!empty($row['comment_id'])) {
+        $comment = new Comment($row['comment_author'], $row['comment_content']);
+        $posts[$postId]->addComment($comment);
+    }
+}
+
+// Renderējam
+echo "<ul>";
+foreach ($posts as $post) {
+    echo $post->render();
+}
+echo "</ul>";
+
 
 
 
